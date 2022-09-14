@@ -4,20 +4,22 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.job4j.auth.model.Person;
-import ru.job4j.auth.repository.PersonRepository;
+import ru.job4j.auth.service.PersonService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/person")
 public class PersonController {
 
-    private final PersonRepository persons;
+    private final PersonService persons;
 
-    public PersonController(final PersonRepository persons) {
+    public PersonController(final PersonService persons) {
         this.persons = persons;
     }
 
     @GetMapping("/")
-    public Iterable<Person> findAll() {
+    public List<Person> findAll() {
         return this.persons.findAll();
     }
 
