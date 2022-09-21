@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS employee(
 CREATE TABLE IF NOT EXISTS person
 (
     id serial primary key not null,
-    login varchar(2000),
+    username varchar(2000),
     password varchar(2000),
     employee_id integer references employee(id)
 );

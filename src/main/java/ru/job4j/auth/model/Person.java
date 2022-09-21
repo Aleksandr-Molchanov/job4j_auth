@@ -11,7 +11,7 @@ public class Person {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String login;
+    private String username;
     private String password;
 
     public int getId() {
@@ -22,12 +22,12 @@ public class Person {
         this.id = id;
     }
 
-    public String getLogin() {
-        return login;
+    public String getUsername() {
+        return username;
     }
 
-    public void setLogin(String login) {
-        this.login = login;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
@@ -48,20 +48,20 @@ public class Person {
         }
         Person person = (Person) o;
         return id == person.id
-                && Objects.equals(login, person.login)
+                && Objects.equals(username, person.username)
                 && Objects.equals(password, person.password);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, login, password);
+        return Objects.hash(id, username, password);
     }
 
     @Override
     public String toString() {
         return "Person{"
                 + "id=" + id
-                + ", login='" + login + '\''
+                + ", username='" + username + '\''
                 + ", password='" + password + '\''
                 + '}';
     }
