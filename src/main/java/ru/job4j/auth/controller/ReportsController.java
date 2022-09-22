@@ -51,6 +51,7 @@ public class ReportsController {
 
     @PutMapping("/")
     public ResponseEntity<Void> update(@RequestBody Person person) {
+        checkingInputData(person);
         rest.put(API, person);
         return ResponseEntity.ok().build();
     }
@@ -59,5 +60,14 @@ public class ReportsController {
     public ResponseEntity<Void> delete(@PathVariable int id) {
         rest.delete(API_ID, id);
         return ResponseEntity.ok().build();
+    }
+
+    private void checkingInputData(@RequestBody Person person) {
+        if (person.getUsername() == null || person.getPassword() == null) {
+            throw new NullPointerException("Username and password mustn't be empty");
+        }
+        if (person.getPassword().length() < 6) {
+            throw new IllegalArgumentException("Invalid password. Password length must be more than 5 characters.");
+        }
     }
 }

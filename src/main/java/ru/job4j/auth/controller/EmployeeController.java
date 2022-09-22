@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 import ru.job4j.auth.model.Employee;
 import ru.job4j.auth.model.Person;
 import ru.job4j.auth.service.EmployeeService;
@@ -40,14 +41,17 @@ public class EmployeeController {
     public ResponseEntity<Employee> findById(@PathVariable int id) {
         var employee = this.employeeService.findById(id);
         return new ResponseEntity<Employee>(
-                employee.orElse(new Employee()),
-                employee.isPresent() ? HttpStatus.OK : HttpStatus.NOT_FOUND
+                employee.orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Employee is not found. Please, check ID."
+                )),
+                HttpStatus.OK
         );
     }
 
     @PostMapping("/{id}")
     public ResponseEntity<Employee> create(@RequestBody Employee employee,
                                            @PathVariable int id) {
+        checkingInputData(employee);
         Person person = rest.getForObject(API_ID, Person.class, id);
         employee.setAccounts(Set.of(person));
         employee.setDateHiring(new Timestamp(System.currentTimeMillis()));
@@ -60,6 +64,7 @@ public class EmployeeController {
     @PutMapping("/updateEmployee/{id}")
     public ResponseEntity<Void> update(@RequestBody Employee employee,
                                        @PathVariable int id) {
+        checkingInputData(employee);
         Person person = rest.getForObject(API_ID, Person.class, id);
         employee.setAccounts(Set.of(person));
         employee.setDateHiring(new Timestamp(System.currentTimeMillis()));
@@ -73,5 +78,14 @@ public class EmployeeController {
         employee.setId(id);
         this.employeeService.delete(employee);
         return ResponseEntity.ok().build();
+    }
+
+    private void checkingInputData(@RequestBody Employee employee) {
+        if (employee.getName() == null || employee.getSurname() == null) {
+            throw new NullPointerException("Name and Surname mustn't be empty");
+        }
+        if (Integer.toString(employee.getInn()).length() != 8) {
+            throw new IllegalArgumentException("Invalid INN. INN length must be equal to 9 characters.");
+        }
     }
 }
