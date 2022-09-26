@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import ru.job4j.auth.model.Employee;
 import ru.job4j.auth.model.Person;
 import ru.job4j.auth.service.PersonService;
 
@@ -37,8 +36,8 @@ public class PersonController {
     }
 
     @GetMapping("/all")
-    public List<Person> findAll() {
-        return this.persons.findAll();
+    public ResponseEntity<List<Person>> findAll() {
+        return ResponseEntity.ok(this.persons.findAll());
     }
 
     @GetMapping("/{id}")
