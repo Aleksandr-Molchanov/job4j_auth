@@ -1,6 +1,10 @@
 package ru.job4j.auth.model;
 
+import ru.job4j.auth.Operation;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.util.Objects;
 import java.util.Set;
@@ -9,9 +13,15 @@ import java.util.Set;
 public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @NotNull(message = "Id must be non null", groups = {
+            Operation.OnUpdate.class, Operation.OnDelete.class
+    })
     private int id;
+    @NotBlank(message = "Title must be not empty")
     private String name;
+    @NotBlank(message = "Title must be not empty")
     private String surname;
+    @NotNull(message = "INN must be non null")
     private int inn;
     private Timestamp dateHiring;
     @OneToMany(cascade = CascadeType.MERGE, orphanRemoval = true)

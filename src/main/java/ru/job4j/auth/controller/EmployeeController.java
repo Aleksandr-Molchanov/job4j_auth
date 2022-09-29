@@ -4,14 +4,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
+import ru.job4j.auth.Operation;
 import ru.job4j.auth.model.Employee;
 import ru.job4j.auth.model.Person;
 import ru.job4j.auth.service.EmployeeService;
 import ru.job4j.auth.service.PersonService;
 
+import javax.validation.Valid;
 import java.sql.Timestamp;
 import java.util.Set;
 
@@ -44,7 +47,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Employee> findById(@PathVariable int id) {
+    public ResponseEntity<Employee> findById(@Valid @PathVariable int id) {
         var employee = this.employeeService.findById(id);
         return new ResponseEntity<Employee>(
                 employee.orElseThrow(() -> new ResponseStatusException(
@@ -55,8 +58,9 @@ public class EmployeeController {
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<Employee> create(@RequestBody Employee employee,
-                                           @PathVariable int id) {
+    @Validated(Operation.OnCreate.class)
+    public ResponseEntity<Employee> create(@Valid @RequestBody Employee employee,
+                                           @Valid @PathVariable int id) {
         checkingInputData(employee);
         Person person = rest.getForObject(API_ID, Person.class, id);
         employee.setAccounts(Set.of(person));
@@ -68,8 +72,9 @@ public class EmployeeController {
     }
 
     @PutMapping("/updateEmployee/{id}")
-    public ResponseEntity<Void> update(@RequestBody Employee employee,
-                                       @PathVariable int id) {
+    @Validated(Operation.OnUpdate.class)
+    public ResponseEntity<Void> update(@Valid @RequestBody Employee employee,
+                                       @Valid @PathVariable int id) {
         checkingInputData(employee);
         Person person = rest.getForObject(API_ID, Person.class, id);
         employee.setAccounts(Set.of(person));
@@ -79,7 +84,8 @@ public class EmployeeController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable int id) {
+    @Validated(Operation.OnDelete.class)
+    public ResponseEntity<Void> delete(@Valid @PathVariable int id) {
         Employee employee = new Employee();
         employee.setId(id);
         this.employeeService.delete(employee);
@@ -87,7 +93,8 @@ public class EmployeeController {
     }
 
     @PatchMapping("/example2")
-    public Person example2(@RequestBody Person person) {
+    @Validated(Operation.OnUpdate.class)
+    public Person example2(@Valid @RequestBody Person person) {
         Person current = personService.findById(person.getId()).get();
         if (person.getUsername() == null || person.getPassword() == null) {
             throw new NullPointerException("Username and password mustn't be empty");
@@ -100,7 +107,7 @@ public class EmployeeController {
         return this.personService.save(current);
     }
 
-    private void checkingInputData(@RequestBody Employee employee) {
+    private void checkingInputData(@Valid @RequestBody Employee employee) {
         if (employee.getName() == null || employee.getSurname() == null) {
             throw new NullPointerException("Name and Surname mustn't be empty");
         }
